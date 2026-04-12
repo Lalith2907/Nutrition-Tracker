@@ -13,12 +13,13 @@ function Meal({ userId }) {
   const [proteinTarget, setProteinTarget] = useState("");
   const [carbTarget, setCarbTarget] = useState("");
   const [fatTarget, setFatTarget] = useState("");
+  const [newFoodCalories, setNewFoodCalories] = useState("");
   const [modal, setModal] = useState({ open: false, text: '', isError: false });
   const [foodList, setFoodList] = useState([]);
   const [mealList, setMealList] = useState([]);
   // Fetch food and meal list on mount
   const fetchMeals = () => {
-    axios.get(`/meal/user/${userId}`)
+    axios.get(`http://localhost:8080/meal/user/${userId}`)
       .then(res => {
         if (Array.isArray(res.data)) setMealList(res.data);
         else setMealList([]);
@@ -26,7 +27,7 @@ function Meal({ userId }) {
       .catch(() => setMealList([]));
   };
   useEffect(() => {
-    axios.get("/food/all")
+    axios.get("http://localhost:8080/food/all")
       .then(res => setFoodList(res.data))
       .catch(() => setFoodList([]));
     fetchMeals();
@@ -81,7 +82,7 @@ function Meal({ userId }) {
         { headers: { 'Content-Type': 'application/json' } }
       );
       setMealId(res.data.mealId || "");
-      setModal({ open: true, text: "Meal created! ID: " + (res.data.mealId || "?"), isError: false });
+      setModal({ open: true, text: `Meal created! #${res.data.userMealNumber || '?'}: ${res.data.mealType || ''}`, isError: false });
       fetchMeals(); // Refresh meal list after creating a meal
     } catch (err) {
       let backendMsg = '';
@@ -119,18 +120,15 @@ function Meal({ userId }) {
   };
 
   const setUserGoal = async () => {
-    if (!calorieTarget.trim() || !proteinTarget.trim() || !carbTarget.trim() || !fatTarget.trim()) {
-      setModal({ open: true, text: "All goal fields are required", isError: true });
+    if (!calorieTarget.trim()) {
+      setModal({ open: true, text: "Calorie target is required", isError: true });
       return;
     }
     try {
       const goal = {
-        calorieTarget: parseFloat(calorieTarget) || 0,
-        proteinTarget: parseFloat(proteinTarget) || 0,
-        carbTarget: parseFloat(carbTarget) || 0,
-        fatTarget: parseFloat(fatTarget) || 0
+        calorieTarget: parseFloat(calorieTarget) || 0
       };
-      await axios.post("http://localhost:8080/goal/set", goal, { headers: { 'Content-Type': 'application/json' } });
+      await axios.post(`http://localhost:8080/goal/set?userId=${userId}`, goal, { headers: { 'Content-Type': 'application/json' } });
       setModal({ open: true, text: "Goal set successfully!", isError: false });
     } catch (err) {
       setModal({ open: true, text: "Goal set failed", isError: true });
@@ -156,14 +154,11 @@ function Meal({ userId }) {
             }}
           >
             <option value="">Select Meal</option>
-            {Array.isArray(mealList) && mealList.length > 0 ? mealList.map(meal => {
-              console.log('Meal object:', meal);
-              return (
-                <option key={meal.mealId} value={meal.mealId}>
-                  {meal.mealType || meal.name || `Meal ${meal.mealId}`}
-                </option>
-              );
-            }) : <option disabled>No meals found</option>}
+            {Array.isArray(mealList) && mealList.length > 0 ? mealList.map(meal => (
+              <option key={meal.mealId} value={meal.mealId}>
+                {meal.mealType || meal.name || `Meal ${meal.mealId}`}
+              </option>
+            )) : <option disabled>No meals found</option>}
           </select>
           <select
             style={{ ...inputStyle, width: '100%' }}
@@ -181,6 +176,18 @@ function Meal({ userId }) {
           </select>
           <div style={{ display: 'flex', gap: 0, alignItems: 'center', marginBottom: 8 }}>
             <input style={{ ...inputStyle, flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0, marginBottom: 0 }} placeholder="Food Name" value={newFoodName} onChange={e => setNewFoodName(e.target.value)} />
+            <input 
+              style={{ ...inputStyle, width: '100px', borderRadius: 0, marginBottom: 0, borderLeft: 'none' }} 
+              placeholder="Calories" 
+              type="text" 
+              value={newFoodCalories} 
+              onChange={e => {
+                const val = e.target.value;
+                if (val === '' || /^[0-9\b]+$/.test(val)) {
+                  setNewFoodCalories(val);
+                }
+              }} 
+            />
             <button style={{
               ...buttonStyle,
               minWidth: 120,
@@ -191,11 +198,15 @@ function Meal({ userId }) {
               height: 40
             }}
               onClick={async () => {
-                if (!newFoodName.trim()) return;
+                if (!newFoodName.trim() || !newFoodCalories.trim()) {
+                  setModal({ open: true, text: "Food name and calories are required", isError: true });
+                  return;
+                }
                 try {
-                  const res = await axios.post("http://localhost:8080/food/add", { name: newFoodName });
+                  const res = await axios.post("http://localhost:8080/food/add", { name: newFoodName, calories: parseFloat(newFoodCalories) });
                   setFoodList([...foodList, res.data]);
                   setNewFoodName("");
+                  setNewFoodCalories("");
                   setModal({ open: true, text: "Food added!", isError: false });
                 } catch (err) {
                   if (err.response && err.response.data && typeof err.response.data === 'string' && err.response.data.toLowerCase().includes('food with this name already exists')) {
@@ -213,10 +224,7 @@ function Meal({ userId }) {
         </div>
         <div style={sectionStyle}>
           <span style={labelStyle}>Set Goal</span>
-          <input style={inputStyle} placeholder="Calorie Target" value={calorieTarget} onChange={e => setCalorieTarget(e.target.value)} />
-          <input style={inputStyle} placeholder="Protein Target" value={proteinTarget} onChange={e => setProteinTarget(e.target.value)} />
-          <input style={inputStyle} placeholder="Carb Target" value={carbTarget} onChange={e => setCarbTarget(e.target.value)} />
-          <input style={inputStyle} placeholder="Fat Target" value={fatTarget} onChange={e => setFatTarget(e.target.value)} />
+          <input style={inputStyle} type="number" placeholder="Calorie Target" value={calorieTarget} onChange={e => setCalorieTarget(e.target.value)} />
           <button style={buttonStyle} onClick={setUserGoal}>Set Goal</button>
         </div>
       </div>

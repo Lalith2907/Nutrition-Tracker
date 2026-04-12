@@ -2,6 +2,7 @@ package com.nutrition.tracker.service;
 
 import com.nutrition.tracker.model.Meal;
 import com.nutrition.tracker.model.MealEntry;
+import com.nutrition.tracker.model.Member;
 import com.nutrition.tracker.repository.MealRepository;
 import com.nutrition.tracker.repository.MealEntryRepository;
 import com.nutrition.tracker.repository.UserRepository;
@@ -26,10 +27,20 @@ public class ReportService {
     @Autowired
     private UserRepository userRepository;
 
-    public Map<String, Double> generateReport(LocalDate start, LocalDate end, String userName) {
+    public Map<String, Object> generateReport(LocalDate start, LocalDate end, String userName) {
         User user = userRepository.findByNameIgnoreCase(userName);
         double totalCalories = 0;
+        double targetCalories = 0;
+        String status = "No goal set";
+
         if (user != null) {
+            if (user instanceof Member) {
+                Member member = (Member) user;
+                if (member.getGoal() != null) {
+                    targetCalories = member.getGoal().getCalorieTarget();
+                }
+            }
+
             List<Meal> meals = mealRepository.getMealsBetweenDates(start, end, user.getUserId());
             if (!meals.isEmpty()) {
                 List<Integer> mealIds = meals.stream().map(Meal::getMealId).toList();
@@ -39,8 +50,23 @@ public class ReportService {
                 }
             }
         }
-        Map<String, Double> report = new HashMap<>();
+        
+        Map<String, Object> report = new HashMap<>();
         report.put("totalCalories", totalCalories);
+        
+        if (targetCalories > 0) {
+            report.put("targetCalories", targetCalories);
+            if (totalCalories >= targetCalories) {
+                report.put("status", "Goal Met!");
+                report.put("caloriesLeft", 0.0);
+            } else {
+                report.put("status", "Goal Not Met");
+                report.put("caloriesLeft", targetCalories - totalCalories);
+            }
+        } else {
+            report.put("status", "No goal set");
+        }
+        
         return report;
     }
 }

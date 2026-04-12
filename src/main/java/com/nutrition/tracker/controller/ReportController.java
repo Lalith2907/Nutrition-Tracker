@@ -10,13 +10,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/report")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ReportController {
 
     @Autowired
     private ReportService reportService;
 
     @GetMapping("/summary")
-    public Map<String, Double> getReport(
+    public Map<String, Object> getReport(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
             @RequestParam("userName") String userName

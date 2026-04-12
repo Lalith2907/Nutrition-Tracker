@@ -17,7 +17,15 @@ public class UserService {
         if (existing != null) {
             throw new RuntimeException("User already exists");
         }
-        return userRepository.save(user);
+        // Always create a Member, not just a User
+        com.nutrition.tracker.model.Member member = new com.nutrition.tracker.model.Member();
+        member.setName(user.getName());
+        member.setEmail(user.getEmail());
+        member.setPassword(user.getPassword());
+        member.setAge(user.getAge());
+        member.setWeight(user.getWeight());
+        member.setHeight(user.getHeight());
+        return userRepository.save(member);
     }
 
     // Login

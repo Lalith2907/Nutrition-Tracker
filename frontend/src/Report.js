@@ -18,7 +18,7 @@ function Report() {
     }
     try {
       const res = await axios.get(
-        `/api/report/summary?start=${start}&end=${end}&userName=${encodeURIComponent(userName)}`
+        `http://localhost:8080/api/report/summary?start=${start}&end=${end}&userName=${encodeURIComponent(userName)}`
       );
       setResult(res.data);
     } catch (err) {
@@ -39,7 +39,19 @@ function Report() {
       {result && (
         <div className="report-result">
           <h3>Report Result</h3>
-          <p>Total Calories: {result.totalCalories}</p>
+          <p><strong>Total Calories:</strong> {result.totalCalories}</p>
+          {result.targetCalories !== undefined && (
+            <>
+              <p><strong>Target Calories:</strong> {result.targetCalories}</p>
+              <p><strong>Calories Left:</strong> {result.caloriesLeft}</p>
+              <p style={{ color: result.status === 'Goal Met!' ? 'green' : 'orange', fontWeight: 'bold' }}>
+                Status: {result.status}
+              </p>
+            </>
+          )}
+          {result.status === 'No goal set' && (
+            <p style={{fontStyle: 'italic', color: 'gray'}}>No calorie goal is currently set for this user.</p>
+          )}
         </div>
       )}
     </div>

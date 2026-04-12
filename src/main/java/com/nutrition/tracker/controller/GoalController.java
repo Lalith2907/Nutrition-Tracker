@@ -14,7 +14,7 @@ public class GoalController {
     private GoalService goalService;
 
     @PostMapping("/set")
-    public Goal setGoal(@RequestBody Goal goal) {
-        return goalService.setGoal(goal);
+    public Goal setGoal(@RequestParam("userId") int userId, @RequestBody Goal goal) {
+        return goalService.setGoal(userId, goal);
     }
 }

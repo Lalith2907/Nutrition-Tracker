@@ -13,6 +13,9 @@ public class Meal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int mealId;
 
+    // Per-user meal number
+    private int userMealNumber;
+
     private String mealType;
     private LocalDate date;
 
@@ -20,5 +23,6 @@ public class Meal {
     private Member member;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<MealEntry> entries;
 }

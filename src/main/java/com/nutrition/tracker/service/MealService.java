@@ -48,17 +48,20 @@ public class MealService {
             throw new RuntimeException("Meal with this name already exists for this user");
         }
         meal.setMember(realMember);
+        if (meal.getDate() == null) {
+            meal.setDate(java.time.LocalDate.now());
+        }
+        // Set per-user meal number
+        int maxUserMealNumber = existingMeals.stream()
+            .mapToInt(m -> m.getUserMealNumber())
+            .max().orElse(0);
+        meal.setUserMealNumber(maxUserMealNumber + 1);
         return mealRepository.save(meal);
     }
 
     public MealEntry addMealEntry(int mealId, int foodId, double quantity) {
         Meal meal = mealRepository.findById(mealId).orElse(null);
         FoodItem food = foodItemRepository.findById(foodId).orElse(null);
-        // Prevent duplicate meal entry for same meal and food
-        MealEntry existing = mealEntryRepository.findByMealIdAndFoodId(mealId, foodId);
-        if (existing != null) {
-            throw new RuntimeException("Meal entry for this food already exists in this meal");
-        }
         MealEntry entry = new MealEntry();
         entry.setMeal(meal);
         entry.setFoodItem(food);

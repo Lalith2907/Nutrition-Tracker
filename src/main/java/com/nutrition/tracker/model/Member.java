@@ -13,4 +13,12 @@ public class Member extends User {
     @OneToOne(cascade = CascadeType.ALL)
     private Goal goal;
     public Member() {}
+
+    public Goal getGoal() {
+        return goal;
+    }
+
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+    }
 }

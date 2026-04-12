@@ -8,7 +8,7 @@ function AdminPanel() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("/api/admin/users");
+      const res = await axios.get("http://localhost:8080/api/admin/users");
       setUsers(res.data);
     } catch (err) {
       setError("Failed to fetch users.");
@@ -23,7 +23,7 @@ function AdminPanel() {
     setError("");
     setSuccess("");
     try {
-      await axios.delete(`/api/admin/users/${id}`);
+      await axios.delete(`http://localhost:8080/api/admin/users/${id}`);
       setSuccess("User deleted successfully.");
       setUsers(users.filter((u) => u.userId !== id));
     } catch (err) {
