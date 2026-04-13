@@ -58,7 +58,7 @@ function App() {
             <button style={toggleBtn(false)} onClick={()=>{setUser(null); setPage("meal");}}>Logout</button>
           </div>
           {page === "meal" && <Meal userId={user.userId} />}
-          {page === "report" && <Report />}
+          {page === "report" && <Report user={user} />}
           {page === "admin" && user.role === "admin" && <AdminPanel />}
         </>
       )}

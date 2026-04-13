@@ -14,6 +14,7 @@ public class FoodItem {
     private double protein;
     private double carbs;
     private double fats;
+    private double fiber;
 
     // Getters and Setters
 
@@ -63,5 +64,13 @@ public class FoodItem {
 
     public void setFats(double fats) {
         this.fats = fats;
+    }
+
+    public double getFiber() {
+        return fiber;
+    }
+
+    public void setFiber(double fiber) {
+        this.fiber = fiber;
     }
 }

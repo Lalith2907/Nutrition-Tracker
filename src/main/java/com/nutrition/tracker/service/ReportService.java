@@ -31,6 +31,14 @@ public class ReportService {
         User user = userRepository.findByNameIgnoreCase(userName);
         double totalCalories = 0;
         double targetCalories = 0;
+        double totalProtein = 0;
+        double totalCarbs = 0;
+        double totalFats = 0;
+        double totalFiber = 0;
+        double targetProtein = 0;
+        double targetCarbs = 0;
+        double targetFats = 0;
+        double targetFiber = 0;
         String status = "No goal set";
 
         if (user != null) {
@@ -38,6 +46,10 @@ public class ReportService {
                 Member member = (Member) user;
                 if (member.getGoal() != null) {
                     targetCalories = member.getGoal().getCalorieTarget();
+                    targetProtein = member.getGoal().getProteinTarget();
+                    targetCarbs = member.getGoal().getCarbTarget();
+                    targetFats = member.getGoal().getFatTarget();
+                    targetFiber = member.getGoal().getFiberTarget();
                 }
             }
 
@@ -47,15 +59,27 @@ public class ReportService {
                 List<MealEntry> entries = mealEntryRepository.findAllByMealIds(mealIds);
                 for (MealEntry entry : entries) {
                     totalCalories += entry.getSubtotalCalories();
+                    totalProtein += entry.getFoodItem().getProtein() * entry.getQuantity();
+                    totalCarbs += entry.getFoodItem().getCarbs() * entry.getQuantity();
+                    totalFats += entry.getFoodItem().getFats() * entry.getQuantity();
+                    totalFiber += entry.getFoodItem().getFiber() * entry.getQuantity();
                 }
             }
         }
         
         Map<String, Object> report = new HashMap<>();
         report.put("totalCalories", totalCalories);
+        report.put("totalProtein", totalProtein);
+        report.put("totalCarbs", totalCarbs);
+        report.put("totalFats", totalFats);
+        report.put("totalFiber", totalFiber);
         
         if (targetCalories > 0) {
             report.put("targetCalories", targetCalories);
+            report.put("targetProtein", targetProtein);
+            report.put("targetCarbs", targetCarbs);
+            report.put("targetFats", targetFats);
+            report.put("targetFiber", targetFiber);
             if (totalCalories >= targetCalories) {
                 report.put("status", "Goal Met!");
                 report.put("caloriesLeft", 0.0);

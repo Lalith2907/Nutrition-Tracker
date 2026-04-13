@@ -13,6 +13,7 @@ public class Goal {
     private double proteinTarget;
     private double carbTarget;
     private double fatTarget;
+    private double fiberTarget;
 
     public double getCalorieTarget() {
         return calorieTarget;
@@ -44,5 +45,13 @@ public class Goal {
 
     public void setFatTarget(double fatTarget) {
         this.fatTarget = fatTarget;
+    }
+
+    public double getFiberTarget() {
+        return fiberTarget;
+    }
+
+    public void setFiberTarget(double fiberTarget) {
+        this.fiberTarget = fiberTarget;
     }
 }

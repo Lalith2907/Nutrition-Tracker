@@ -13,7 +13,12 @@ function Meal({ userId }) {
   const [proteinTarget, setProteinTarget] = useState("");
   const [carbTarget, setCarbTarget] = useState("");
   const [fatTarget, setFatTarget] = useState("");
+  const [fiberTarget, setFiberTarget] = useState("");
   const [newFoodCalories, setNewFoodCalories] = useState("");
+  const [newFoodProtein, setNewFoodProtein] = useState("");
+  const [newFoodCarbs, setNewFoodCarbs] = useState("");
+  const [newFoodFats, setNewFoodFats] = useState("");
+  const [newFoodFiber, setNewFoodFiber] = useState("");
   const [modal, setModal] = useState({ open: false, text: '', isError: false });
   const [foodList, setFoodList] = useState([]);
   const [mealList, setMealList] = useState([]);
@@ -33,39 +38,67 @@ function Meal({ userId }) {
     fetchMeals();
   }, [userId]);
 
-  const cardStyle = {
-    background: "#fff",
-    borderRadius: 12,
-    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-    padding: 32,
-    margin: "32px auto",
-    maxWidth: 420,
-    minWidth: 320,
+  const containerStyle = {
+    maxWidth: 900,
+    margin: "40px auto",
+    padding: "0 20px",
     display: "flex",
     flexDirection: "column",
     gap: 24
   };
-  const sectionStyle = { marginBottom: 24 };
-  const labelStyle = { fontWeight: 600, marginBottom: 8, display: "block" };
+  const titleStyle = {
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#1e293b",
+    fontSize: 28
+  };
+  const cardStyle = {
+    background: "#fff",
+    borderRadius: 16,
+    boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+    padding: 32,
+    width: "100%",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    gap: 16
+  };
+  // We'll no longer use sectionStyle as the background but rather to hold content properly inside each card.
+  const sectionStyle = {
+    display: "flex",
+    flexDirection: "column",
+  };
+  const labelStyle = { 
+    fontWeight: 700, 
+    fontSize: 17, 
+    color: "#1e293b", 
+    marginBottom: 16, 
+    display: "block",
+    paddingBottom: 8,
+    borderBottom: "1px solid #eaeaea"
+  };
   const inputStyle = {
-    padding: "10px 12px",
-    borderRadius: 6,
-    border: "1px solid #bbb",
-    marginRight: 12,
-    marginBottom: 8,
-    width: "calc(100% - 120px)",
-    fontSize: 16
+    padding: "12px 16px",
+    borderRadius: 8,
+    border: "1px solid #d1d5db",
+    width: "100%",
+    boxSizing: "border-box",
+    fontSize: 15,
+    marginBottom: 12,
+    fontFamily: "inherit"
   };
   const buttonStyle = {
-    padding: "10px 20px",
-    borderRadius: 6,
+    padding: "12px 20px",
+    borderRadius: 8,
     border: "none",
-    background: "#1976d2",
+    background: "#3b82f6",
     color: "#fff",
     fontWeight: 600,
     fontSize: 16,
     cursor: "pointer",
-    marginBottom: 8
+    width: "100%",
+    boxShadow: "0 2px 4px rgba(59, 130, 246, 0.3)",
+    transition: "background 0.2s"
   };
   const msgStyle = { color: '#1976d2', fontWeight: 500, minHeight: 24, marginTop: 8 };
 
@@ -126,7 +159,11 @@ function Meal({ userId }) {
     }
     try {
       const goal = {
-        calorieTarget: parseFloat(calorieTarget) || 0
+        calorieTarget: parseFloat(calorieTarget) || 0,
+        proteinTarget: parseFloat(proteinTarget) || 0,
+        carbTarget: parseFloat(carbTarget) || 0,
+        fatTarget: parseFloat(fatTarget) || 0,
+        fiberTarget: parseFloat(fiberTarget) || 0
       };
       await axios.post(`http://localhost:8080/goal/set?userId=${userId}`, goal, { headers: { 'Content-Type': 'application/json' } });
       setModal({ open: true, text: "Goal set successfully!", isError: false });
@@ -137,15 +174,20 @@ function Meal({ userId }) {
 
   return (
     <>
-      <div style={cardStyle}>
-        <h2 style={{textAlign: "center", marginBottom: 32}}>Meal & Goal Tracking</h2>
-        <div style={sectionStyle}>
-          <span style={labelStyle}>Create Meal</span>
-          <input style={inputStyle} placeholder="Meal Name" value={mealName} onChange={e => setMealName(e.target.value)} />
-          <button style={buttonStyle} onClick={createMeal}>Create Meal</button>
+      <div style={containerStyle}>
+        <h2 style={titleStyle}>Meal & Goal Tracking</h2>
+
+        <div style={cardStyle}>
+          <div style={sectionStyle}>
+            <span style={labelStyle}>Create Meal</span>
+            <input style={inputStyle} placeholder="Meal Name" value={mealName} onChange={e => setMealName(e.target.value)} />
+            <button style={buttonStyle} onClick={createMeal}>Create Meal</button>
+          </div>
         </div>
-        <div style={sectionStyle}>
-          <span style={labelStyle}>Add Entry to Meal</span>
+
+        <div style={cardStyle}>
+          <div style={sectionStyle}>
+            <span style={labelStyle}>Add Entry to Meal</span>
           <select
             style={{ ...inputStyle, width: '100%' }}
             value={mealId}
@@ -174,39 +216,85 @@ function Meal({ userId }) {
               <option key={food.foodId} value={food.foodId}>{food.name}</option>
             ))}
           </select>
-          <div style={{ display: 'flex', gap: 0, alignItems: 'center', marginBottom: 8 }}>
-            <input style={{ ...inputStyle, flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0, marginBottom: 0 }} placeholder="Food Name" value={newFoodName} onChange={e => setNewFoodName(e.target.value)} />
-            <input 
-              style={{ ...inputStyle, width: '100px', borderRadius: 0, marginBottom: 0, borderLeft: 'none' }} 
-              placeholder="Calories" 
-              type="text" 
-              value={newFoodCalories} 
+          <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, marginBottom: 12, border: '1px solid #e0e0e0' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#555', textTransform: 'uppercase', marginBottom: 12, display: 'block' }}>Or Create New Food</span>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+              <input style={{ ...inputStyle, flex: 2, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} placeholder="New Food Name" value={newFoodName} onChange={e => setNewFoodName(e.target.value)} />
+              <input
+                style={{ ...inputStyle, flex: 1, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }}
+                placeholder="Calories"
+                type="text"
+                value={newFoodCalories}
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9\b]+$/.test(val)) setNewFoodCalories(val);
+                }}
+              />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 8 }}>
+              <input
+                style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }}
+                placeholder="Protein (g)"
+                type="text"
+                value={newFoodProtein}
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9\b.]+$/.test(val)) setNewFoodProtein(val);
+                }}
+              />
+              <input
+                style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }}
+                placeholder="Carbs (g)"
+                type="text"
+              value={newFoodCarbs} 
               onChange={e => {
                 const val = e.target.value;
-                if (val === '' || /^[0-9\b]+$/.test(val)) {
-                  setNewFoodCalories(val);
-                }
+                if (val === '' || /^[0-9\b.]+$/.test(val)) setNewFoodCarbs(val);
               }} 
             />
-            <button style={{
-              ...buttonStyle,
-              minWidth: 120,
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              marginLeft: -1,
-              marginBottom: 0,
-              height: 40
-            }}
-              onClick={async () => {
+            <input
+              style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }}
+              placeholder="Fats (g)"
+              type="text"
+              value={newFoodFats}
+              onChange={e => {
+                const val = e.target.value;
+                if (val === '' || /^[0-9\b.]+$/.test(val)) setNewFoodFats(val); 
+              }}
+            />
+            <input
+              style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }}
+              placeholder="Fiber (g)"
+              type="text"
+              value={newFoodFiber}
+              onChange={e => {
+                const val = e.target.value;
+                if (val === '' || /^[0-9\b.]+$/.test(val)) setNewFoodFiber(val);
+              }}
+            />
+          </div>
+          <button style={{ ...buttonStyle, width: '100%', marginBottom: 0, height: 40 }}
+            onClick={async () => {
                 if (!newFoodName.trim() || !newFoodCalories.trim()) {
                   setModal({ open: true, text: "Food name and calories are required", isError: true });
                   return;
                 }
                 try {
-                  const res = await axios.post("http://localhost:8080/food/add", { name: newFoodName, calories: parseFloat(newFoodCalories) });
+                  const res = await axios.post("http://localhost:8080/food/add", {
+                    name: newFoodName,
+                    calories: parseFloat(newFoodCalories),
+                    protein: parseFloat(newFoodProtein) || 0,
+                    carbs: parseFloat(newFoodCarbs) || 0,
+                    fats: parseFloat(newFoodFats) || 0,
+                    fiber: parseFloat(newFoodFiber) || 0
+                  });
                   setFoodList([...foodList, res.data]);
                   setNewFoodName("");
                   setNewFoodCalories("");
+                  setNewFoodProtein("");
+                  setNewFoodCarbs("");
+                  setNewFoodFats("");
+                  setNewFoodFiber("");
                   setModal({ open: true, text: "Food added!", isError: false });
                 } catch (err) {
                   if (err.response && err.response.data && typeof err.response.data === 'string' && err.response.data.toLowerCase().includes('food with this name already exists')) {
@@ -221,11 +309,21 @@ function Meal({ userId }) {
           {/* Removed duplicate Food Name field as requested */}
           <input style={inputStyle} placeholder="Quantity" value={quantity} onChange={e => setQuantity(e.target.value)} />
           <button style={buttonStyle} onClick={addEntry}>Add Entry</button>
+          </div>
         </div>
-        <div style={sectionStyle}>
-          <span style={labelStyle}>Set Goal</span>
-          <input style={inputStyle} type="number" placeholder="Calorie Target" value={calorieTarget} onChange={e => setCalorieTarget(e.target.value)} />
+
+        <div style={cardStyle}>
+          <div style={sectionStyle}>
+            <span style={labelStyle}>Set Goal</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 8 }}>
+            <input style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} type="number" placeholder="Calorie Target" value={calorieTarget} onChange={e => setCalorieTarget(e.target.value)} />
+            <input style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} type="number" placeholder="Protein (g)" value={proteinTarget} onChange={e => setProteinTarget(e.target.value)} />
+            <input style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} type="number" placeholder="Carbs (g)" value={carbTarget} onChange={e => setCarbTarget(e.target.value)} />
+            <input style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} type="number" placeholder="Fats (g)" value={fatTarget} onChange={e => setFatTarget(e.target.value)} />
+            <input style={{ ...inputStyle, marginBottom: 0, marginRight: 0, width: '100%', boxSizing: 'border-box' }} type="number" placeholder="Fiber (g)" value={fiberTarget} onChange={e => setFiberTarget(e.target.value)} />
+          </div>
           <button style={buttonStyle} onClick={setUserGoal}>Set Goal</button>
+          </div>
         </div>
       </div>
       {modal.open && (
