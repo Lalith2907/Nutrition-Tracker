@@ -1,5 +1,6 @@
 package com.nutrition.tracker.service;
 
+import com.nutrition.tracker.model.Admin;
 import com.nutrition.tracker.model.User;
 import com.nutrition.tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,16 @@ public class UserService {
 
     // Login
     public User login(String email, String password) {
+        // Hardcoded Admin authentication check in the Backend
+        if ("admin".equals(email) && "admin".equals(password)) {
+            Admin admin = new Admin();
+            admin.setUserId(0); // Dummy ID
+            admin.setName("System Admin");
+            admin.setEmail("admin");
+            admin.setPassword("admin");
+            return admin;
+        }
+
         User user = userRepository.findByEmail(email);
 
         if (user != null && user.getPassword().equals(password)) {

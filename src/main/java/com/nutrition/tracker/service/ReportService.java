@@ -80,13 +80,21 @@ public class ReportService {
             report.put("targetCarbs", targetCarbs);
             report.put("targetFats", targetFats);
             report.put("targetFiber", targetFiber);
-            if (totalCalories >= targetCalories) {
+            
+            // A realistic goal checking logic: Goal is met ONLY if all macros and calories meet their intended targets
+            boolean caloriesMet = totalCalories >= targetCalories;
+            boolean proteinMet = totalProtein >= targetProtein;
+            boolean carbsMet = totalCarbs >= targetCarbs;
+            boolean fatsMet = totalFats >= targetFats;
+            boolean fiberMet = totalFiber >= targetFiber;
+
+            if (caloriesMet && proteinMet && carbsMet && fatsMet && fiberMet) {
                 report.put("status", "Goal Met!");
-                report.put("caloriesLeft", 0.0);
             } else {
                 report.put("status", "Goal Not Met");
-                report.put("caloriesLeft", targetCalories - totalCalories);
             }
+            
+            report.put("caloriesLeft", targetCalories - totalCalories);
         } else {
             report.put("status", "No goal set");
         }

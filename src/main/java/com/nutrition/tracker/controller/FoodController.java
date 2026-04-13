@@ -36,6 +36,7 @@ public class FoodController {
         if (payload.containsKey("protein")) foodItem.setProtein(Double.parseDouble(payload.get("protein").toString()));
         if (payload.containsKey("carbs")) foodItem.setCarbs(Double.parseDouble(payload.get("carbs").toString()));
         if (payload.containsKey("fats")) foodItem.setFats(Double.parseDouble(payload.get("fats").toString()));
+        if (payload.containsKey("fiber")) foodItem.setFiber(Double.parseDouble(payload.get("fiber").toString()));
         FoodItem saved = foodItemRepository.save(foodItem);
         return ResponseEntity.ok(saved);
     }

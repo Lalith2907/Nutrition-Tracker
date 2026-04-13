@@ -42,6 +42,7 @@ function Login({ onLogin }) {
   const handleLogin = async () => {
     setMsg("");
     setMsgType("");
+
     try {
       const res = await axios.post(
         `http://localhost:8080/auth/login?email=${email}&password=${password}`
@@ -66,6 +67,7 @@ function Login({ onLogin }) {
       <input style={inputStyle} placeholder="Email" onChange={e => setEmail(e.target.value)} />
       <input style={inputStyle} placeholder="Password" type="password" onChange={e => setPassword(e.target.value)} />
       <button style={buttonStyle} onClick={handleLogin}>Login</button>
+
       {msg && (
         <div style={{
           marginTop: 16,

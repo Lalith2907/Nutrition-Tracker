@@ -74,4 +74,8 @@ public abstract class User {
     public void setHeight(double height) {
         this.height = height;
     }
+
+    public String getRole() {
+        return this.getClass().getSimpleName().toLowerCase();
+    }
 }
