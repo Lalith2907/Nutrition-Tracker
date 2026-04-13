@@ -41,19 +41,19 @@ function App() {
             <button style={toggleBtn(showLogin)} onClick={() => setShowLogin(true)}>Login</button>
             <button style={toggleBtn(!showLogin)} onClick={() => setShowLogin(false)}>Register</button>
           </div>
-          {showLogin ? <Login onLogin={setUser} /> : <Register />}
+          {showLogin ? <Login onLogin={u => { setUser(u); setPage(u.role === 'admin' ? 'admin' : 'meal'); }} /> : <Register />}
         </>
       )}
       {user && (
         <>
           <div style={{display:'flex', gap:12, justifyContent:'center', margin:'24px 0'}}>
-            <button style={toggleBtn(page==="meal")}
-              onClick={()=>setPage("meal")}>Meals</button>
-            <button style={toggleBtn(page==="report")}
-              onClick={()=>setPage("report")}>Report</button>
-            {user.role === "admin" && (
-              <button style={toggleBtn(page==="admin")}
-                onClick={()=>setPage("admin")}>Admin Panel</button>
+            {user.role === "admin" ? (
+              <button style={toggleBtn(page==="admin")} onClick={()=>setPage("admin")}>Admin Panel</button>
+            ) : (
+              <>
+                <button style={toggleBtn(page==="meal")} onClick={()=>setPage("meal")}>Meals</button>
+                <button style={toggleBtn(page==="report")} onClick={()=>setPage("report")}>Report</button>
+              </>
             )}
             <button style={toggleBtn(false)} onClick={()=>{setUser(null); setPage("meal");}}>Logout</button>
           </div>
